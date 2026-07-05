@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dalam World — Масштабная 3D MMO</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;color:#fff;background:#0a0a0f;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+
+/* ---- BG ---- */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;background:url('https://ru.dalam.world/dwback.jpeg') center/cover no-repeat fixed}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,10,15,.65) 0%,rgba(10,10,15,.45) 50%,rgba(10,10,15,.9) 100%);z-index:0}
+.hero>*{position:relative;z-index:1}
+
+/* ---- MASCOT ---- */
+.mascot{position:fixed;right:0;bottom:0;width:180px;height:auto;z-index:50;pointer-events:none;filter:drop-shadow(0 0 20px rgba(0,0,0,.6));transition:opacity .3s}
+@media(max-width:768px){.mascot{width:100px}}
+
+/* ---- TYPOGRAPHY ---- */
+.badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#fbbf24;border:1px solid rgba(251,191,36,.3);padding:6px 18px;border-radius:999px;margin-bottom:20px;background:rgba(251,191,36,.06)}
+h1{font-size:clamp(2.2rem,6vw,4.5rem);font-weight:900;line-height:1.05;letter-spacing:-.03em;margin-bottom:16px}
+h1 span{color:#fbbf24}
+.subtitle{font-size:clamp(1rem,2vw,1.25rem);font-weight:300;line-height:1.6;max-width:680px;margin:0 auto 32px;color:rgba(255,255,255,.75)}
+
+/* ---- BUTTONS ---- */
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:40px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-primary{background:#fbbf24;color:#0a0a0f}
+.btn-primary:hover{background:#f59e0b;transform:translateY(-2px);box-shadow:0 8px 25px rgba(251,191,36,.3)}
+.btn-outline{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.2)}
+.btn-outline:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.05);transform:translateY(-2px)}
+.btn-sm{padding:10px 22px;font-size:13px}
+
+/* ---- COUNTDOWN ---- */
+.countdown-wrap{margin-bottom:10px}
+.countdown-label{font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px}
+.countdown{display:flex;gap:10px;justify-content:center}
+.cd-block{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 20px;min-width:80px;backdrop-filter:blur(8px)}
+.cd-num{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;color:#fbbf24;line-height:1}
+.cd-txt{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:6px}
+
+/* ---- SECTIONS ---- */
+section{padding:80px 20px}
+.section-dark{background:#0e0e14}
+.section-darker{background:#0a0a0f}
+.container{max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#fbbf24;margin-bottom:10px}
+h2{font-size:clamp(1.6rem,4vw,2.5rem);font-weight:800;letter-spacing:-.02em;margin-bottom:16px;line-height:1.15}
+.section-desc{font-size:15px;font-weight:300;line-height:1.7;color:rgba(255,255,255,.6);max-width:700px;margin-bottom:40px}
+
+/* ---- MECHANICS GRID ---- */
+.mech-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.mech-item{display:flex;align-items:center;gap:12px;padding:16px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;transition:all .25s}
+.mech-item:hover{background:rgba(251,191,36,.06);border-color:rgba(251,191,36,.2);transform:translateY(-2px)}
+.mech-icon{width:36px;height:36px;border-radius:8px;background:rgba(251,191,36,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.mech-text{font-size:14px;font-weight:500}
+
+/* ---- AGE CARDS ---- */
+.age-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.age-card{padding:28px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:all .25s}
+.age-card:hover{border-color:rgba(251,191,36,.15);background:rgba(255,255,255,.05)}
+.age-card h3{font-size:18px;font-weight:700;margin-bottom:10px}
+.age-card p{font-size:13px;font-weight:300;line-height:1.7;color:rgba(255,255,255,.55)}
+
+/* ---- PETS ---- */
+.pets-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.pet-tag{padding:8px 18px;border-radius:999px;font-size:13px;font-weight:500;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);transition:all .2s}
+.pet-tag:hover{border-color:rgba(251,191,36,.3);color:#fbbf24}
+.pet-highlight{font-size:15px;font-weight:300;line-height:1.7;color:rgba(255,255,255,.6);margin-top:16px}
+
+/* ---- SPECS TABLE ---- */
+.spec-table{width:100%;border-collapse:collapse;max-width:700px;font-size:13px}
+.spec-table th,.spec-table td{padding:12px 16px;text-align:left;border-bottom:1px solid rgba(255,255,255,.06)}
+.spec-table th{font-weight:600;color:rgba(255,255,255,.4);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.spec-table td{color:rgba(255,255,255,.7);font-weight:300}
+.spec-table tr:hover td{background:rgba(255,255,255,.02)}
+.spec-note{font-size:12px;color:rgba(255,255,255,.35);margin-top:12px;font-weight:300}
+
+/* ---- BANNERS ---- */
+.banners-grid{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}
+.banner-slot{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.25);font-size:11px;font-weight:500;letter-spacing:.05em;transition:all .2s}
+.banner-468{width:468px;height:60px}
+.banner-88{width:88px;height:31px}
+.banner-slot:hover{border-color:rgba(251,191,36,.3);color:rgba(255,255,255,.5)}
+@media(max-width:520px){.banner-468{width:100%;height:60px}}
+
+/* ---- FOOTER ---- */
+footer{padding:40px 20px;border-top:1px solid rgba(255,255,255,.06);text-align:center}
+.footer-links{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.footer-links a{font-size:13px;font-weight:500;color:rgba(255,255,255,.4);transition:color .2s}
+.footer-links a:hover{color:#fbbf24}
+.footer-copy{font-size:11px;color:rgba(255,255,255,.2);font-weight:300}
+
+/* ---- SCROLL ANIM ---- */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ---- SCROLLBAR ---- */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0a0a0f}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.2)}
+</style>
+</head>
+<body>
+
+<!-- MASCOT -->
+<img class="mascot" src="https://ru.dalam.world/thl.png" alt="Dalam Mascot">
+
+<!-- ====== HERO ====== -->
+<div class="hero">
+  <div class="badge">MMO • PvP • PvE • Крафт • Осады</div>
+  <h1>DALAM <span>WORLD</span></h1>
+  <p class="subtitle">Масштабный бесшовный 3D-мир на 500 000 игроков. Без лагов, без ограничений — только настоящие эмоции.</p>
+
+  <div class="btns">
+    <a href="https://dalam.world/#modal-downloads" class="btn btn-primary">⬇ Скачать игру</a>
+    <a href="https://dalam.world/#modal-register" class="btn btn-outline">Регистрация</a>
+    <a href="https://link.dalam.world/discord" class="btn btn-outline btn-sm">Discord</a>
+  </div>
+
+  <div class="countdown-wrap">
+    <div class="countdown-label">До открытия мира</div>
+    <div class="countdown">
+      <div class="cd-block"><div class="cd-num" id="cd-d">000</div><div class="cd-txt">Дней</div></div>
+      <div class="cd-block"><div class="cd-num" id="cd-h">00</div><div class="cd-txt">Часов</div></div>
+      <div class="cd-block"><div class="cd-num" id="cd-m">00</div><div class="cd-txt">Минут</div></div>
+      <div class="cd-block"><div class="cd-num" id="cd-s">00</div><div class="cd-txt">Секунд</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ABOUT ====== -->
+<section class="section-dark">
+  <div class="container reveal">
+    <div class="section-label">О игре</div>
+    <h2>Не просто игра — мир, где<br>каждый шаг полон смысла</h2>
+    <p class="section-desc">В эпоху быстрых игр и одноразовых развлечений Dalam World возвращает настоящие эмоции: радость победы в эпической битве, восторг от открытия новых земель, трепет от создания альянса с друзьями. Несколько огромных континентов, бесшовный мир, баланс стратегии, действия и социальных взаимодействий.</p>
+  </div>
+</section>
+
+<!-- ====== MECHANICS ====== -->
+<section class="section-darker">
+  <div class="container reveal">
+    <div class="section-label">Механики</div>
+    <h2>Интересный геймплей<br>с первого часа</h2>
+    <div class="mech-grid">
+      <div class="mech-item"><div class="mech-icon">⚔️</div><div class="mech-text">Масштабные бои за города</div></div>
+      <div class="mech-item"><div class="mech-icon">🏛️</div><div class="mech-text">Продуманная система налогов</div></div>
+      <div class="mech-item"><div class="mech-icon">🏰</div><div class="mech-text">Эпические осады замков</div></div>
+      <div class="mech-item"><div class="mech-icon">🏠</div><div class="mech-text">Дома кланов и личные дома</div></div>
+      <div class="mech-item"><div class="mech-icon">🐉</div><div class="mech-text">Ставки на забеги монстров</div></div>
+      <div class="mech-item"><div class="mech-icon">🎣</div><div class="mech-text">Рыбалка, корабли, PvP и PvE</div></div>
+      <div class="mech-item"><div class="mech-icon">🔨</div><div class="mech-text">Полноценный крафт</div></div>
+      <div class="mech-item"><div class="mech-icon">🎰</div><div class="mech-text">Мировая Лотерея</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOR ALL AGES ====== -->
+<section class="section-dark">
+  <div class="container reveal">
+    <div class="section-label">Для всех возрастов</div>
+    <h2>Игра, где поколения<br>встречаются</h2>
+    <div class="age-grid">
+      <div class="age-card">
+        <h3>🧒 Для детей</h3>
+        <p>Волшебный мир открытий: веселые квесты, создание персонажей, захват замков и новые друзья в безопасной онлайн-среде с акцентом на сотрудничество и творчество.</p>
+      </div>
+      <div class="age-card">
+        <h3>🎮 Для подростков</h3>
+        <p>Адреналин PvP-битв, тактика осад и свобода исследования огромного мира. Развитие навыков лидерства, планирования и командной работы.</p>
+      </div>
+      <div class="age-card">
+        <h3>🧑‍💼 Для взрослых</h3>
+        <p>Ностальгический оазис: глубокий геймплей с элементами стратегии, экономики и социальных взаимодействий. Расслабление после работы, клан с друзьями, эмоции триумфа и братства.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== PETS ====== -->
+<section class="section-darker">
+  <div class="container reveal">
+    <div class="section-label">Спутники</div>
+    <h2>А ещё… у нас есть питомцы!</h2>
+    <div class="pets-row">
+      <span class="pet-tag">🐺 Волки</span>
+      <span class="pet-tag">🐆 Снежные барсы</span>
+      <span class="pet-tag">🐉 Дракончики</span>
+      <span class="pet-tag">🐔 Курицы</span>
+      <span class="pet-tag">🐱 Коты</span>
+      <span class="pet-tag">🤖 Мех. голем</span>
+      <span class="pet-tag">🐾 И другие…</span>
+    </div>
+    <p class="pet-highlight">Заводи верных спутников, путешествуй с ними по миру и даже собери собственного механического голема — уникального питомца, созданного твоими руками.</p>
+  </div>
+</section>
+
+<!-- ====== SYSTEM REQUIREMENTS ====== -->
+<section class="section-dark">
+  <div class="container reveal">
+    <div class="section-label">Системные требования</div>
+    <h2>Запустится даже на<br>старом железе</h2>
+    <table class="spec-table">
+      <thead>
+        <tr><th>Компонент</th><th>Минимум</th><th>Рекомендуем</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Память (диск)</td><td>8.1 Гб</td><td>12.2 Гб</td></tr>
+        <tr><td>Процессор</td><td>2.4 GHz</td><td>3.2 GHz</td></tr>
+        <tr><td>Оперативная память</td><td>1 Гб</td><td>4 Гб</td></tr>
+        <tr><td>Видеокарта</td><td>256 Мб</td><td>4 Гб</td></tr>
+        <tr><td>Интернет</td><td>52 Kbps</td><td>1 Mbps</td></tr>
+        <tr><td>ОС</td><td>Windows XP</td><td>Windows 10</td></tr>
+      </tbody>
+    </table>
+    <p class="spec-note">✦ Игра также доступна на Linux и macOS</p>
+  </div>
+</section>
+
+<!-- ====== BANNERS ====== -->
+<section class="section-darker">
+  <div class="container reveal">
+    <div class="section-label">Партнёрам</div>
+    <h2>Баннеры</h2>
+    <div class="banners-grid">
+      <div class="banner-slot banner-468"><a href="https://l2anons.info/en"   target="_blank"><img src="https://images.l2anons.info/logo_L2Anons.png" width="468" height="60" alt="New Lineage 2 servers, server list, Lineage 2 server announcements" title="New Lineage 2 servers, server list, Lineage 2 server announcements" border="0"></a></div>
+      <div class="banner-slot banner-88"><a href="http://La2Top.Ru/" target="_blank"><img src="http://La2Top.Ru/resource/img/logo1.png"  border="0" width="90" height="30" alt="La2Top.Ru: анонсы и рейтинги серверов Lineage2"></a></div>
+      <div class="banner-slot banner-88"><a href="http://l2king.net/" target="_blank"><img src="http://l2king.net/images/buttons/1.jpg" width="90" height="30" alt="L2King - мониторинг игровых проектов Linage 2" title="Мониторинг игровых проектов Linage 2" border="0" /></a></div>
+      <div class="banner-slot banner-88"><a  target="_blank" href="https://la2-anons.com/"><img border="0" width="90" height="30" title="Новые сервера Lineage 2, Анонсы серверов Lineage 2" alt="Новые сервера Lineage 2, Анонсы серверов Lineage 2" src="https://la2-anons.com/la2-anons.png" border="0"></a></div>
+      <div class="banner-slot banner-88"><a  target="_blank" border="0" width="90" height="30"
+ href="https://new-lineage.ru"><img src="https://new-lineage.ru/IMG/L2.gif"
+ alt="Анонсы серверов Lineage 2" title="Анонсы серверов Lineage 2"></a></div>
+      <div class="banner-slot banner-88"> <a href="https://la2up.ru"  target="_blank"><img src="https://la2up.ru/bnrs/Logo_knopka.png" alt="Анонсы серверов Lineage 2 | Выбирай лучшие сервера Lineage 2" title="Анонсы серверов Lineage 2 | Выбирай лучшие сервера Lineage 2" width="90" height="30" ></a> </div>
+      <div class="banner-slot banner-88"><a href="https://l2hub.net"  target="_blank"><img src="https://l2hub.net/bnrs/l2hub.png" alt="L2Hub.net - Анонсы серверов Lineage2, анонсы серверов л2" title="L2Hub.net - Анонсы серверов Lineage2, анонсы серверов л2" width="90" height="30"   ></a></div>
+      <div class="banner-slot banner-88"><a href="https://l2an.com"  target="_blank"><img width="90" height="30"   src="https://l2an.com/bnrs/l2anbn.jpg" alt="Анонсы серверов Lineage 2" title="Анонсы серверов Lineage 2"></a></div>
+       <div class="banner-slot banner-88"> <a href="https://l2argument.ru" target="_blank" title="База знаний и рейтинг серверов Lineage 2" ><img src="https://l2argument.ru/assets/images/l2argument3.jpg" width="90" height="30" /></a></div>
+       <div class="banner-slot banner-88"><a href="https://l2list.com"  target="_blank"><img src="https://l2list.com/bnrs/l2list_lineage2.png" alt="New private servers Lineage 2" title="New private servers Lineage 2"  width="90" height="30"></a></div>
+       <div class="banner-slot banner-88"> <a href="https://l2gop.com"  target="_blank"><img src="https://l2gop.com/bnrs/banners.png" alt="Анонсы серверов Lineage 2, Новые сервера Lineage 2, Lineage 2 сервера" title="Анонсы серверов Lineage 2, Новые сервера Lineage 2, Lineage 2 сервера" width="90" height="30"  ></a> </div>
+       <div class="banner-slot banner-88"> <a href="https://lin2top.com/"  target="_blank" title="Новые сервера Lineage 2"><img src="https://lin2top.com/static/images/lin2top-dark.gif" alt="Новые сервера Lineage 2" border="0" width="90" height="30" /></a> </div>
+       <div class="banner-slot banner-88"> <a href="https://en.l2top.info" title="⭐ L2 Top 200 [2024 TOP]: lineage 2 top servers List" alt="Explore the top L2 servers of 2024! Dive into the Lineage 2 world with our comprehensive guide to L2 Top 200 servers, interlude editions, and more!">
+    <img src="https://en.l2top.info/img/L2TOP-INFO-180x54.gif" alt="Explore the top L2 servers of 2024! Dive into the Lineage 2 world with our comprehensive guide to L2 Top 200 servers, interlude editions, and more!" decoding="async"  width="90" height="30" />
+</a> </div>
+      <!--div class="banner-slot banner-88">88×31</div-->
+    </div>
+  </div>
+</section>
+
+<!-- ====== CTA ====== -->
+<section class="section-dark" style="text-align:center">
+  <div class="container reveal">
+    <h2>Мир ждёт тебя</h2>
+    <p class="section-desc" style="margin:0 auto 28px">Присоединяйся к тысячам игроков. Регистрация открыта — успей занять своё место до старта.</p>
+    <div class="btns" style="margin-bottom:0">
+      <a href="https://dalam.world/#modal-downloads" class="btn btn-primary">⬇ Скачать</a>
+      <a href="https://dalam.world/#modal-register" class="btn btn-outline">Регистрация</a>
+      <a href="https://dalam.world/forums/" class="btn btn-outline btn-sm">Форум</a>
+      <a href="https://link.dalam.world/discord" class="btn btn-outline btn-sm">Discord</a>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer>
+  <div class="footer-links">
+    <a href="https://dalam.world/#modal-downloads">Скачать</a>
+    <a href="https://dalam.world/#modal-register">Регистрация</a>
+    <a href="https://dalam.world/forums/">Форум</a>
+    <a href="https://link.dalam.world/discord">Discord</a>
+  </div>
+  <div class="footer-copy">© 2025 Dalam World. Все права защищены.</div>
+</footer>
+
+<!-- ====== SCRIPTS ====== -->
+<script>
+// Countdown to 16.07.2026 19:00 GMT+3
+(function(){
+  const target = new Date('2026-07-16T19:00:00+03:00').getTime();
+  const $d=document.getElementById('cd-d'),
+        $h=document.getElementById('cd-h'),
+        $m=document.getElementById('cd-m'),
+        $s=document.getElementById('cd-s');
+
+  function pad(n,len){return String(n).padStart(len,'0')}
+
+  function tick(){
+    const diff = target - Date.now();
+    if(diff<=0){
+      $d.textContent='000';$h.textContent='00';$m.textContent='00';$s.textContent='00';
+      return;
+    }
+    const d=Math.floor(diff/86400000);
+    const h=Math.floor((diff%86400000)/3600000);
+    const m=Math.floor((diff%3600000)/60000);
+    const s=Math.floor((diff%60000)/1000);
+    $d.textContent=pad(d,3);
+    $h.textContent=pad(h,2);
+    $m.textContent=pad(m,2);
+    $s.textContent=pad(s,2);
+  }
+  tick();
+  setInterval(tick,1000);
+})();
+
+// Reveal on scroll
+(function(){
+  const els=document.querySelectorAll('.reveal');
+  if(!els.length) return;
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}});
+  },{threshold:0.12});
+  els.forEach(el=>io.observe(el));
+})();
+
+// Hide mascot on small scroll
+(function(){
+  const m=document.querySelector('.mascot');
+  let hidden=false;
+  window.addEventListener('scroll',()=>{
+    if(!hidden && window.scrollY>400){m.style.opacity='0';hidden=true}
+    else if(hidden && window.scrollY<=400){m.style.opacity='1';hidden=false}
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
